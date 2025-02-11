@@ -4,7 +4,8 @@ from fastapi import HTTPException
 def verify_faces(image1_path: str, image2_path: str):
     """Compare two face images using DeepFace."""
     try:
-        result = DeepFace.verify(image1_path, image2_path, distance_metric='euclidean_l2')
+        result = DeepFace.verify(image1_path, image2_path, distance_metric='euclidean_l2', model_name='ArcFace')
+        print("Result:", result)
 
         distance = result['distance']
         threshold = result['threshold']
