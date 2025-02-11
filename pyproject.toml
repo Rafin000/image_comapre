@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "e-kyc"
+version = "0.1.0"
+description = ""
+authors = ["Rafin000 <marufulislam00000@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+tensorflow = "2.18.0"
+deepface = "^0.0.93"
+flask = "^3.1.0"
+tf-keras = "^2.18.0"
+keras = "3.5.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
