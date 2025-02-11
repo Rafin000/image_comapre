@@ -9,9 +9,11 @@ readme = "README.md"
 python = "^3.10"
 tensorflow = "2.18.0"
 deepface = "^0.0.93"
-flask = "^3.1.0"
 tf-keras = "^2.18.0"
 keras = "3.5.0"
+uvicorn = "^0.34.0"
+fastapi = "^0.115.8"
+python-multipart = "^0.0.20"
 
 
 [build-system]
