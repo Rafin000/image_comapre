@@ -9,7 +9,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
-@app.post('/verify', summary="Verify Face Similarity", tags=["Face Verification"])
+@app.post('/verify_faces', summary="Verify Face Similarity", tags=["Face Verification"])
 async def verify_faces_api(
     image1: UploadFile = File(..., description="First image file (jpg, jpeg, png)"),
     image2: UploadFile = File(..., description="Second image file (jpg, jpeg, png)")
