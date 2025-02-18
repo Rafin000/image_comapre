@@ -1,3 +1,4 @@
+#src/utils.py
 from pathlib import Path
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}

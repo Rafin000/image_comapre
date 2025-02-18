@@ -1,7 +1,10 @@
+#main.py
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from pathlib import Path
-from src.face_verification import verify_faces
-from src.utils import UPLOAD_DIR, allowed_file, secure_filename
+# from src.face_verification import verify_faces
+import io
+from celery.result import AsyncResult
+from src.tasks import verify_faces_task, celery_app  
 
 app = FastAPI(
     title="Face Verification API",
@@ -9,45 +12,65 @@ app = FastAPI(
     version="1.0.0"
 )
 
-@app.post('/verify_faces', summary="Verify Face Similarity", tags=["Face Verification"])
-async def verify_faces_api(
-    image1: UploadFile = File(..., description="First image file (jpg, jpeg, png)"),
-    image2: UploadFile = File(..., description="Second image file (jpg, jpeg, png)")
+# @app.post('/verify_faces')
+# async def verify_faces_api(
+#     image1: UploadFile = File(...),
+#     image2: UploadFile = File(...)
+# ):
+#     """Compares two images to determine if they belong to the same person."""
+    
+#     if not image1 or not image2:
+#         raise HTTPException(status_code=400, detail="Both images are required")
+
+#     # Read files into memory (BytesIO)
+#     image1_data = io.BytesIO(await image1.read())
+#     image2_data = io.BytesIO(await image2.read())
+
+#     response = verify_faces(image1_data, image2_data)
+
+#     return response
+
+
+# task_results = {}
+
+@app.post('/verify_faces_async')
+async def verify_faces_async(
+    image1: UploadFile = File(...),
+    image2: UploadFile = File(...)
 ):
-    """
-    Compares two images to determine if they belong to the same person.
-
-    **Request:**
-    - `image1`: The first image file (jpg, jpeg, png)
-    - `image2`: The second image file (jpg, jpeg, png)
-
-    **Response:**
-    - A JSON object containing verification results.
-    """
+    """Asynchronously compares two images to determine if they belong to the same person."""
+    
     if not image1 or not image2:
         raise HTTPException(status_code=400, detail="Both images are required")
 
-    if not allowed_file(image1.filename) or not allowed_file(image2.filename):
-        raise HTTPException(status_code=400, detail="Invalid file type. Only png, jpg, jpeg are allowed.")
+    # Read files into memory
+    image1_bytes = await image1.read()
+    image2_bytes = await image2.read()
 
-    # Secure filenames and set file paths
-    image1_path = UPLOAD_DIR / secure_filename(image1.filename)
-    image2_path = UPLOAD_DIR / secure_filename(image2.filename)
+    # Submit task to Celery
+    task = verify_faces_task.delay(image1_bytes, image2_bytes)
+    
+    # Return task ID for client to check status
+    return {"task_id": task.id, "status": "processing"}
 
-    # Save uploaded images
-    with image1.file as f1, image2.file as f2:
-        with open(image1_path, 'wb') as img1, open(image2_path, 'wb') as img2:
-            img1.write(f1.read())
-            img2.write(f2.read())
 
-    # Perform face verification
-    response = verify_faces(str(image1_path), str(image2_path))
-
-    # Cleanup uploaded images after processing
-    image1_path.unlink(missing_ok=True)
-    image2_path.unlink(missing_ok=True)
-
-    return response
+@app.get('/task_result/{task_id}')
+async def get_task_result(task_id: str):
+    """Get the result of an asynchronous face verification task."""
+    result = AsyncResult(task_id, app=celery_app)
+    
+    if result.ready():
+        return {
+            "task_id": task_id,
+            "status": "completed",
+            "result": result.result  
+        }
+    else:
+        return {
+            "task_id": task_id,
+            "status": "processing"
+        }
+    
 
 if __name__ == '__main__':
     import uvicorn
