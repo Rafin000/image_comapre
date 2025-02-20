@@ -7,15 +7,13 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-tensorflow = "2.18.0"
 deepface = "^0.0.93"
-tf-keras = "^2.18.0"
-keras = "3.5.0"
 uvicorn = "^0.34.0"
 fastapi = "^0.115.8"
-python-multipart = "^0.0.20"
 celery = "^5.4.0"
 redis = "^5.2.1"
+tf-keras = "^2.18.0"
+python-multipart = "^0.0.20"
 
 
 [build-system]
