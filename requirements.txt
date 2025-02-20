@@ -2,6 +2,7 @@ absl-py==2.1.0
 amqp==5.3.1
 annotated-types==0.7.0
 anyio==4.8.0
+astor==0.8.1
 astunparse==1.6.3
 async-timeout==5.0.1
 beautifulsoup4==4.13.3
@@ -28,12 +29,14 @@ google-pasta==0.2.0
 grpcio==1.70.0
 gunicorn==23.0.0
 h11==0.14.0
-h5py==3.12.1
+h5py==3.13.0
 idna==3.10
 itsdangerous==2.2.0
 Jinja2==3.1.5
 joblib==1.4.2
 keras==3.8.0
+Keras-Applications==1.0.8
+Keras-Preprocessing==1.1.2
 kombu==5.4.2
 libclang==18.1.1
 lz4==4.4.3
@@ -42,6 +45,7 @@ markdown-it-py==3.0.0
 MarkupSafe==3.0.2
 mdurl==0.1.2
 ml-dtypes==0.4.1
+mock==5.1.0
 mtcnn==1.0.0
 namex==0.0.8
 numpy==2.0.2
@@ -71,6 +75,7 @@ starlette==0.45.3
 tensorboard==2.18.0
 tensorboard-data-server==0.7.2
 tensorflow==2.18.0
+tensorflow-estimator==1.13.0
 tensorflow-io-gcs-filesystem==0.37.1
 termcolor==2.5.0
 tf_keras==2.18.0

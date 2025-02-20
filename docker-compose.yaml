@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  app:
+    image: rafin1998/face-verification-app:1
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+    environment:
+      - SECRET_KEY=43sae!@#wsf
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - HOST=0.0.0.0 
+      - PORT=8000
+      - RELOAD=false 
+      - WORKERS=1
+      - DEBUG=false   
+      - MODEL_NAME=Facenet512
+      - DISTANCE_METRIC=euclidean_l2
+    networks:
+      - app-network
+
+  celery_worker:
+    image: rafin1998/face-verification-app:1
+    command: celery -A src.tasks.celery_app worker --loglevel=info
+    depends_on:
+      - redis
+      - app
+    environment:
+      - SECRET_KEY=43sae!@#wsf
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - MODEL_NAME=Facenet512
+      - DISTANCE_METRIC=euclidean_l2
+    networks:
+      - app-network
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    restart: always
+    networks:
+      - app-network
+    command: redis-server --appendonly yes
+
+networks:
+  app-network:
+    driver: bridge

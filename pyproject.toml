@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "e-kyc"
+name = "e-kyc(1)"
 version = "0.1.0"
 description = ""
 authors = ["Rafin000 <marufulislam00000@gmail.com>"]
@@ -7,11 +7,12 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-deepface = "^0.0.93"
 uvicorn = "^0.34.0"
 fastapi = "^0.115.8"
 celery = "^5.4.0"
 redis = "^5.2.1"
+tensorflow = ">=2.0.0"
+deepface = "^0.0.93"
 tf-keras = "^2.18.0"
 python-multipart = "^0.0.20"
 
