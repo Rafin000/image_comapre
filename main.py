@@ -1,9 +1,16 @@
-# main.py
+import logging
 from fastapi import FastAPI, File, UploadFile, HTTPException
-import io
 from celery.result import AsyncResult
 from src.tasks import verify_faces_task, celery_app
 from src.config import BaseConfig
+
+logging.basicConfig(
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    level=logging.DEBUG, 
+    handlers=[
+        logging.StreamHandler()  
+    ]
+)
 
 app = FastAPI(
     title="Face Verification API",
@@ -19,11 +26,13 @@ async def verify_faces_async(
     """Asynchronously compares two images to determine if they belong to the same person."""
     
     if not image1 or not image2:
+        logging.warning("One or both images are missing in the request")
         raise HTTPException(status_code=400, detail="Both images are required")
 
     image1_bytes = await image1.read()
     image2_bytes = await image2.read()
 
+    logging.info("Received images for verification, sending to Celery task")
     task = verify_faces_task.delay(image1_bytes, image2_bytes)
     
     return {"task_id": task.id, "status": "processing"}
@@ -31,15 +40,18 @@ async def verify_faces_async(
 @app.get('/task_result/{task_id}')
 async def get_task_result(task_id: str):
     """Get the result of an asynchronous face verification task."""
+    logging.debug(f"Fetching result for task ID: {task_id}")
     result = AsyncResult(task_id, app=celery_app)
     
     if result.ready():
+        logging.info(f"Task {task_id} completed with result: {result.result}")
         return {
             "task_id": task_id,
             "status": "completed",
             "result": result.result  
         }
     else:
+        logging.info(f"Task {task_id} is still processing")
         return {
             "task_id": task_id,
             "status": "processing"
@@ -47,6 +59,7 @@ async def get_task_result(task_id: str):
 
 if __name__ == '__main__':
     import uvicorn
+    logging.info("Starting FastAPI application")
     uvicorn.run(
         app, 
         host=BaseConfig.HOST, 
